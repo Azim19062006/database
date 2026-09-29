@@ -1,15 +1,15 @@
-# Лабораторная работа 5
+# Лабораторная работа 4
 
 Азим Маматбаев
 
-Тема: базы данных в PostgreSQL.
+Тема: первые SQL-запросы.
 
-Я удалил базу `university`, которая осталась после предыдущей попытки, и создал её заново. Потом вывел список баз и подключился к `university` через `psql`.
+Я выполнил запросы `SELECT` к таблице `university.public.students`: вывел все столбцы, отдельные столбцы, применил `WHERE`, `ORDER BY` и `LIMIT`. В материале лабораторной используется столбец `name`, а в моей таблице он называется `first_name`, поэтому в запросах я использовал `first_name AS name`. В примере `ORDER BY` не указан столбец сортировки; я указал `first_name`.
 
-Результат: команды `DROP DATABASE` и `CREATE DATABASE` выполнились успешно. В списке баз есть `university`, а `SELECT current_database()` вернул `university`.
+Результат: все запросы выполнились без ошибок. Таблица пока пустая (`COUNT(*) = 0`), поэтому выборки вернули 0 строк. Данные для результата я не добавлял.
 
 [Вывод psql](result.txt)
 
-![Результат проверки базы university](result.png)
+![Результаты запросов SELECT](result.png)
 
-[Мои SQL-команды](lab5.sql) · [Материал лабораторной](https://docs.google.com/document/d/1tACFw9v3Um6sak1ZjbQzxRur91qSvJKw/edit)
+[Мои SQL-команды](lab4.sql) · [Материал лабораторной](https://docs.google.com/document/d/10qSdz8lve4SAzF0mLsQW1yG2oGQPK1aX/edit)

@@ -1,15 +1,74 @@
-                                                  List of databases
-    Name    | Owner | Encoding | Locale Provider |   Collate   |    Ctype    | Locale | ICU Rules | Access privileges 
-------------+-------+----------+-----------------+-------------+-------------+--------+-----------+-------------------
- university | azim  | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           | 
+/******** QUERY *********/
+SELECT COUNT(*) AS total_students FROM students;
+/************************/
+
+ total_students 
+----------------
+              0
 (1 row)
 
 /******** QUERY *********/
-SELECT current_database();
+SELECT * FROM students;
 /************************/
 
- current_database 
-------------------
- university
-(1 row)
+ student_id | first_name | last_name | email | faculty 
+------------+------------+-----------+-------+---------
+(0 rows)
+
+/******** QUERY *********/
+SELECT first_name AS name, email FROM students;
+/************************/
+
+ name | email 
+------+-------
+(0 rows)
+
+/******** QUERY *********/
+SELECT student_id, faculty FROM students;
+/************************/
+
+ student_id | faculty 
+------------+---------
+(0 rows)
+
+/******** QUERY *********/
+SELECT first_name AS name, email
+FROM students
+WHERE first_name = 'Timur';
+/************************/
+
+ name | email 
+------+-------
+(0 rows)
+
+/******** QUERY *********/
+SELECT first_name AS name, email
+FROM students
+ORDER BY first_name;
+/************************/
+
+ name | email 
+------+-------
+(0 rows)
+
+/******** QUERY *********/
+SELECT first_name AS name, email
+FROM students
+ORDER BY first_name, student_id
+LIMIT 2;
+/************************/
+
+ name | email 
+------+-------
+(0 rows)
+
+/******** QUERY *********/
+SELECT first_name AS name, faculty
+FROM students
+WHERE faculty = 'Engineering';
+/************************/
+
+ name | faculty 
+------+---------
+(0 rows)
 

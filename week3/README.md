@@ -1,17 +1,15 @@
-# Лабораторная работа 6
+# Лабораторная работа 5
 
 Азим Маматбаев
 
-Тема: таблицы, типы данных и ограничения.
+Тема: базы данных в PostgreSQL.
 
-В базе `university` я создал таблицу `students` по примеру из файла: `student_id` — `SERIAL PRIMARY KEY`, имена — `VARCHAR(50) NOT NULL`, `email` — `VARCHAR(100) UNIQUE NOT NULL`, `faculty` — `VARCHAR(100)`. Команды `\dt` и `\d students` показали таблицу и её ограничения.
+Я удалил базу `university`, которая осталась после предыдущей попытки, и создал её заново. Потом вывел список баз и подключился к `university` через `psql`.
 
-На отдельной `test_table` я выполнил действия из разделов про `ALTER TABLE` и `DROP TABLE`: добавил столбец, изменил тип, добавил `CHECK`, переименовал и удалил столбец, переименовал таблицу и удалил её. Также создал временную таблицу, которая исчезает после завершения сеанса.
-
-Результат: в схеме `public` осталась только таблица `students` с пятью столбцами.
+Результат: команды `DROP DATABASE` и `CREATE DATABASE` выполнились успешно. В списке баз есть `university`, а `SELECT current_database()` вернул `university`.
 
 [Вывод psql](result.txt)
 
-![Результат проверки таблицы students](result.png)
+![Результат проверки базы university](result.png)
 
-[Мои SQL-команды](lab6.sql) · [Материал лабораторной](https://docs.google.com/document/d/1VbzMZLRlmZaGdtf2FBgx3tjAhQRSBaNU/edit)
+[Мои SQL-команды](lab5.sql) · [Материал лабораторной](https://docs.google.com/document/d/1tACFw9v3Um6sak1ZjbQzxRur91qSvJKw/edit)
