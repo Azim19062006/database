@@ -8,8 +8,8 @@
 
 Результат: команды `DROP DATABASE` и `CREATE DATABASE` выполнились успешно. В списке баз есть `university`, а `SELECT current_database()` вернул `university`.
 
-[Вывод psql](result.txt)
+[Вывод psql](lab5-result.txt)
 
-![Результат проверки базы university](result.png)
+![Результат проверки базы university](lab5-result.png)
 
 [Мои SQL-команды](lab5.sql) · [Материал лабораторной](https://docs.google.com/document/d/1tACFw9v3Um6sak1ZjbQzxRur91qSvJKw/edit)

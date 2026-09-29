@@ -8,8 +8,8 @@
 
 Результат: все запросы выполнились без ошибок. Таблица пока пустая (`COUNT(*) = 0`), поэтому выборки вернули 0 строк. Данные для результата я не добавлял.
 
-[Вывод psql](result.txt)
+[Вывод psql](lab4-result.txt)
 
-![Результаты запросов SELECT](result.png)
+![Результаты запросов SELECT](lab4-result.png)
 
 [Мои SQL-команды](lab4.sql) · [Материал лабораторной](https://docs.google.com/document/d/10qSdz8lve4SAzF0mLsQW1yG2oGQPK1aX/edit)
