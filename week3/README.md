@@ -10,4 +10,8 @@
 
 Результат: в схеме `public` осталась только таблица `students` с пятью столбцами.
 
+[Вывод psql](result.txt)
+
+![Результат проверки таблицы students](result.png)
+
 [Мои SQL-команды](lab6.sql) · [Материал лабораторной](https://docs.google.com/document/d/1VbzMZLRlmZaGdtf2FBgx3tjAhQRSBaNU/edit)

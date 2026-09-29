@@ -1,0 +1,18 @@
+          List of tables
+ Schema |   Name   | Type  | Owner 
+--------+----------+-------+-------
+ public | students | table | azim
+(1 row)
+
+                                          Table "public.students"
+   Column   |          Type          | Collation | Nullable |                   Default                    
+------------+------------------------+-----------+----------+----------------------------------------------
+ student_id | integer                |           | not null | nextval('students_student_id_seq'::regclass)
+ first_name | character varying(50)  |           | not null | 
+ last_name  | character varying(50)  |           | not null | 
+ email      | character varying(100) |           | not null | 
+ faculty    | character varying(100) |           |          | 
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+    "students_email_key" UNIQUE CONSTRAINT, btree (email)
+

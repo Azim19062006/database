@@ -1,0 +1,15 @@
+                                                  List of databases
+    Name    | Owner | Encoding | Locale Provider |   Collate   |    Ctype    | Locale | ICU Rules | Access privileges 
+------------+-------+----------+-----------------+-------------+-------------+--------+-----------+-------------------
+ university | azim  | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           | 
+(1 row)
+
+/******** QUERY *********/
+SELECT current_database();
+/************************/
+
+ current_database 
+------------------
+ university
+(1 row)
+
