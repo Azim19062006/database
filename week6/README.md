@@ -10,7 +10,7 @@
 
 [SQL работы](lab8.sql) · [Проверочные команды](verify.sql) · [Вывод psql](result.txt)
 
-![Таблицы со связями](lab8-tables.png)
+![Таблицы и записи студентов на курсы](lab8-overview.png)
 
 ![Правила внешних ключей](lab8-relations.png)
 
