@@ -1,0 +1,46 @@
+You are now connected to database "university" as user "azim".
+ON DELETE CASCADE: dependent enrollments and profile disappear in the transaction
+BEGIN
+DELETE 1
+ cascade_enrollments_ok
+------------------------
+ t
+(1 row)
+
+ cascade_profile_ok
+--------------------
+ t
+(1 row)
+
+ROLLBACK
+ON DELETE SET NULL: course keeps its row, professor reference becomes NULL
+BEGIN
+DELETE 1
+ set_null_ok
+-------------
+ t
+(1 row)
+
+ROLLBACK
+ON DELETE SET DEFAULT: course moves from department 2 to default department 1
+BEGIN
+DELETE 1
+ set_default_ok
+----------------
+ t
+(1 row)
+
+ROLLBACK
+ON DELETE RESTRICT: referenced department cannot be removed
+psql:week6/verify-actions.sql:36: NOTICE:  RESTRICT rejected deleting department 1
+DO
+ON UPDATE CASCADE: changing student ID updates enrollment FK
+BEGIN
+DELETE 1
+UPDATE 1
+ update_cascade_ok
+-------------------
+ t
+(1 row)
+
+ROLLBACK

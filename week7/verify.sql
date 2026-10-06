@@ -2,7 +2,10 @@
 \connect university
 
 \dt lab9.*
+\d lab9.authors
+\d lab9.books
 \d lab9.book_authors
+\d lab9.members
 \d lab9.loans
 
 SELECT c.conrelid::regclass AS table_name, c.conname AS constraint_name,

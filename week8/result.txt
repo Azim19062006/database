@@ -1,11 +1,12 @@
+You are now connected to database "university" as user "azim".
           List of tables
- Schema |   Name   | Type  | Owner 
+ Schema |   Name   | Type  | Owner
 --------+----------+-------+-------
  public | students | table | azim
 (1 row)
 
                List of tables
- Schema |        Name        | Type  | Owner 
+ Schema |        Name        | Type  | Owner
 --------+--------------------+-------+-------
  lab7   | course_enrollments | table | azim
  lab7   | customers          | table | azim
@@ -20,19 +21,20 @@
  lab7   | transactions       | table | azim
 (11 rows)
 
-              List of tables
- Schema |       Name       | Type  | Owner 
---------+------------------+-------+-------
- lab8   | courses          | table | azim
- lab8   | departments      | table | azim
- lab8   | enrollments      | table | azim
- lab8   | professors       | table | azim
- lab8   | student_profiles | table | azim
- lab8   | students         | table | azim
-(6 rows)
+                   List of tables
+ Schema |            Name            | Type  | Owner
+--------+----------------------------+-------+-------
+ lab8   | courses                    | table | azim
+ lab8   | departments                | table | azim
+ lab8   | enrollments                | table | azim
+ lab8   | professors                 | table | azim
+ lab8   | student_profiles           | table | azim
+ lab8   | student_profiles_shared_pk | table | azim
+ lab8   | students                   | table | azim
+(7 rows)
 
             List of tables
- Schema |     Name     | Type  | Owner 
+ Schema |     Name     | Type  | Owner
 --------+--------------+-------+-------
  lab9   | authors      | table | azim
  lab9   | book_authors | table | azim
@@ -42,35 +44,35 @@
 (5 rows)
 
                                           Table "public.students"
-   Column   |          Type          | Collation | Nullable |                   Default                    
+   Column   |          Type          | Collation | Nullable |                   Default
 ------------+------------------------+-----------+----------+----------------------------------------------
  student_id | integer                |           | not null | nextval('students_student_id_seq'::regclass)
- first_name | character varying(50)  |           | not null | 
- last_name  | character varying(50)  |           | not null | 
- email      | character varying(100) |           | not null | 
- faculty    | character varying(100) |           |          | 
+ first_name | character varying(50)  |           | not null |
+ last_name  | character varying(50)  |           | not null |
+ email      | character varying(100) |           | not null |
+ faculty    | character varying(100) |           |          |
 Indexes:
     "students_pkey" PRIMARY KEY, btree (student_id)
     "students_email_key" UNIQUE CONSTRAINT, btree (email)
 
                         Table "lab7.course_enrollments"
-     Column      |         Type          | Collation | Nullable |   Default    
+     Column      |         Type          | Collation | Nullable |   Default
 -----------------+-----------------------+-----------+----------+--------------
- student_id      | integer               |           | not null | 
- course_id       | integer               |           | not null | 
- semester        | character varying(20) |           | not null | 
+ student_id      | integer               |           | not null |
+ course_id       | integer               |           | not null |
+ semester        | character varying(20) |           | not null |
  enrollment_date | date                  |           |          | CURRENT_DATE
- grade           | character(2)          |           |          | 
+ grade           | character(2)          |           |          |
 Indexes:
     "course_enrollments_pkey" PRIMARY KEY, btree (student_id, course_id, semester)
 
                       Table "lab8.enrollments"
-   Column   |         Type          | Collation | Nullable | Default 
+   Column   |         Type          | Collation | Nullable | Default
 ------------+-----------------------+-----------+----------+---------
- student_id | integer               |           | not null | 
- course_id  | integer               |           | not null | 
- semester   | character varying(20) |           | not null | 
- grade      | character(2)          |           |          | 
+ student_id | integer               |           | not null |
+ course_id  | integer               |           | not null |
+ semester   | character varying(20) |           | not null |
+ grade      | character(2)          |           |          |
 Indexes:
     "enrollments_pkey" PRIMARY KEY, btree (student_id, course_id, semester)
 Foreign-key constraints:
@@ -78,55 +80,48 @@ Foreign-key constraints:
     "enrollments_student_fk" FOREIGN KEY (student_id) REFERENCES lab8.students(student_id) ON UPDATE CASCADE ON DELETE CASCADE
 
               Table "lab9.book_authors"
-  Column   |  Type   | Collation | Nullable | Default 
+  Column   |  Type   | Collation | Nullable | Default
 -----------+---------+-----------+----------+---------
- book_id   | integer |           | not null | 
- author_id | integer |           | not null | 
+ book_id   | integer |           | not null |
+ author_id | integer |           | not null |
 Indexes:
     "book_authors_pkey" PRIMARY KEY, btree (book_id, author_id)
 Foreign-key constraints:
     "book_authors_author_id_fkey" FOREIGN KEY (author_id) REFERENCES lab9.authors(author_id)
     "book_authors_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
 
-                             Table "lab9.loans"
-   Column    |  Type   | Collation | Nullable |           Default            
--------------+---------+-----------+----------+------------------------------
- loan_id     | integer |           | not null | generated always as identity
- member_id   | integer |           | not null | 
- book_id     | integer |           | not null | 
- borrowed_on | date    |           | not null | CURRENT_DATE
- due_on      | date    |           | not null | 
- returned_on | date    |           |          | 
+                                Table "lab9.loans"
+   Column    |     Type      | Collation | Nullable |           Default
+-------------+---------------+-----------+----------+------------------------------
+ loan_id     | integer       |           | not null | generated always as identity
+ member_id   | integer       |           | not null |
+ book_id     | integer       |           | not null |
+ loan_date   | date          |           | not null | CURRENT_DATE
+ due_date    | date          |           | not null |
+ return_date | date          |           |          |
+ late_fee    | numeric(10,2) |           |          | 0.00
 Indexes:
     "loans_pkey" PRIMARY KEY, btree (loan_id)
-    "loans_due_on_idx" btree (due_on)
+    "loans_due_date_idx" btree (due_date)
 Check constraints:
-    "loans_dates_valid" CHECK (due_on >= borrowed_on AND (returned_on IS NULL OR returned_on >= borrowed_on))
+    "loans_dates_valid" CHECK (due_date >= loan_date AND (return_date IS NULL OR return_date >= loan_date))
+    "loans_late_fee_nonnegative" CHECK (late_fee >= 0::numeric)
 Foreign-key constraints:
     "loans_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
     "loans_member_id_fkey" FOREIGN KEY (member_id) REFERENCES lab9.members(member_id)
 
-/******** QUERY *********/
-SELECT c.conrelid::regclass AS child_table,
-       c.confrelid::regclass AS parent_table,
-       c.conname AS foreign_key
-FROM pg_constraint c
-JOIN pg_namespace n ON n.oid = c.connamespace
-WHERE n.nspname IN ('lab8', 'lab9') AND c.contype = 'f'
-ORDER BY c.conrelid::regclass::text, c.confrelid::regclass::text;
-/************************/
-
-      child_table      |   parent_table   |           foreign_key            
------------------------+------------------+----------------------------------
- lab8.courses          | lab8.departments | courses_department_fk
- lab8.courses          | lab8.professors  | courses_professor_fk
- lab8.enrollments      | lab8.courses     | enrollments_course_fk
- lab8.enrollments      | lab8.students    | enrollments_student_fk
- lab8.professors       | lab8.departments | professors_department_id_fkey
- lab8.student_profiles | lab8.students    | student_profiles_student_id_fkey
- lab9.book_authors     | lab9.authors     | book_authors_author_id_fkey
- lab9.book_authors     | lab9.books       | book_authors_book_id_fkey
- lab9.loans            | lab9.books       | loans_book_id_fkey
- lab9.loans            | lab9.members     | loans_member_id_fkey
-(10 rows)
+           child_table           |   parent_table   |                foreign_key
+---------------------------------+------------------+--------------------------------------------
+ lab8.courses                    | lab8.departments | courses_department_fk
+ lab8.courses                    | lab8.professors  | courses_professor_fk
+ lab8.enrollments                | lab8.courses     | enrollments_course_fk
+ lab8.enrollments                | lab8.students    | enrollments_student_fk
+ lab8.professors                 | lab8.departments | professors_department_id_fkey
+ lab8.student_profiles           | lab8.students    | student_profiles_student_id_fkey
+ lab8.student_profiles_shared_pk | lab8.students    | student_profiles_shared_pk_student_id_fkey
+ lab9.book_authors               | lab9.authors     | book_authors_author_id_fkey
+ lab9.book_authors               | lab9.books       | book_authors_book_id_fkey
+ lab9.loans                      | lab9.books       | loans_book_id_fkey
+ lab9.loans                      | lab9.members     | loans_member_id_fkey
+(11 rows)
 

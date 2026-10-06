@@ -42,6 +42,11 @@ CREATE TABLE student_profiles (
         ON DELETE CASCADE
 );
 
+CREATE TABLE student_profiles_shared_pk (
+    student_id INTEGER PRIMARY KEY REFERENCES students(student_id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE enrollments (
     student_id INTEGER NOT NULL,
     course_id INTEGER NOT NULL,
@@ -58,6 +63,15 @@ ALTER TABLE enrollments
 INSERT INTO enrollments (student_id, course_id, semester, grade)
 SELECT student_id, course_id, semester, grade
 FROM lab7.course_enrollments;
+
+INSERT INTO departments (dept_id, dept_name) VALUES (2, 'Mathematics');
+INSERT INTO professors (department_id) VALUES (1);
+UPDATE courses
+SET professor_id = (SELECT MIN(professor_id) FROM professors)
+WHERE course_id = 101;
+UPDATE courses SET department_id = 2 WHERE course_id = 102;
+INSERT INTO student_profiles (student_id) VALUES (1);
+INSERT INTO student_profiles_shared_pk (student_id) VALUES (2);
 
 DO $$
 BEGIN

@@ -8,13 +8,16 @@ SET search_path TO lab9;
 CREATE TABLE books (
     book_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
-    isbn VARCHAR(20) UNIQUE
+    isbn VARCHAR(13) UNIQUE,
+    publication_year INTEGER,
+    available_copies INTEGER DEFAULT 1
 );
 
 CREATE TABLE authors (
     author_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    birth_date DATE
 );
 
 CREATE TABLE book_authors (
@@ -25,23 +28,27 @@ CREATE TABLE book_authors (
 
 CREATE TABLE members (
     member_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone VARCHAR(15),
+    membership_date DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE loans (
     loan_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     member_id INTEGER NOT NULL REFERENCES members(member_id),
     book_id INTEGER NOT NULL REFERENCES books(book_id),
-    borrowed_on DATE NOT NULL DEFAULT CURRENT_DATE,
-    due_on DATE NOT NULL,
-    returned_on DATE,
+    loan_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    due_date DATE NOT NULL,
+    return_date DATE,
+    late_fee DECIMAL(10,2) DEFAULT 0.00,
     CONSTRAINT loans_dates_valid CHECK (
-        due_on >= borrowed_on AND
-        (returned_on IS NULL OR returned_on >= borrowed_on)
-    )
+        due_date >= loan_date AND
+        (return_date IS NULL OR return_date >= loan_date)
+    ),
+    CONSTRAINT loans_late_fee_nonnegative CHECK (late_fee >= 0)
 );
 
-CREATE INDEX loans_due_on_idx ON loans(due_on);
+CREATE INDEX loans_due_date_idx ON loans(due_date);
 COMMIT;

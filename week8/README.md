@@ -18,10 +18,10 @@
 
 ![Окно ERD Tool в pgAdmin 4](pgadmin-erd-screen.jpg)
 
-![ER-диаграмма базы university, экспорт из pgAdmin 4](pgadmin-university-erd.png)
+![ER-диаграмма базы university, экспорт из pgAdmin 4 до дополнения Lab 8](pgadmin-university-erd.png)
 
 [Открыть диаграмму pgAdmin в полном размере](pgadmin-university-erd.png)
 
-На общей диаграмме показаны все 23 таблицы базы. Экспорт pgAdmin широкий, поэтому его лучше открыть в полном размере. Список внешних ключей есть в [выводе psql](result.txt).
+После дополнения Lab 8 база содержит 24 таблицы. Общий экспорт pgAdmin был сделан до добавления `lab8.student_profiles_shared_pk`, поэтому на нём показаны 23 таблицы. Актуальная структура всех 24 таблиц и список внешних ключей есть в [выводе psql](result.txt). Общий экспорт широкий, поэтому его лучше открыть в полном размере.
 
 [Материал лабораторной](https://docs.google.com/document/d/10Mzs-G_WIk6rxG1QF6IywiR-CuzAKEPC/edit)

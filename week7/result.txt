@@ -1,5 +1,6 @@
+You are now connected to database "university" as user "azim".
             List of tables
- Schema |     Name     | Type  | Owner 
+ Schema |     Name     | Type  | Owner
 --------+--------------+-------+-------
  lab9   | authors      | table | azim
  lab9   | book_authors | table | azim
@@ -8,49 +9,80 @@
  lab9   | members      | table | azim
 (5 rows)
 
+                                   Table "lab9.authors"
+   Column   |         Type          | Collation | Nullable |           Default
+------------+-----------------------+-----------+----------+------------------------------
+ author_id  | integer               |           | not null | generated always as identity
+ first_name | character varying(50) |           | not null |
+ last_name  | character varying(50) |           | not null |
+ birth_date | date                  |           |          |
+Indexes:
+    "authors_pkey" PRIMARY KEY, btree (author_id)
+Referenced by:
+    TABLE "lab9.book_authors" CONSTRAINT "book_authors_author_id_fkey" FOREIGN KEY (author_id) REFERENCES lab9.authors(author_id)
+
+                                       Table "lab9.books"
+      Column      |          Type          | Collation | Nullable |           Default
+------------------+------------------------+-----------+----------+------------------------------
+ book_id          | integer                |           | not null | generated always as identity
+ title            | character varying(200) |           | not null |
+ isbn             | character varying(13)  |           |          |
+ publication_year | integer                |           |          |
+ available_copies | integer                |           |          | 1
+Indexes:
+    "books_pkey" PRIMARY KEY, btree (book_id)
+    "books_isbn_key" UNIQUE CONSTRAINT, btree (isbn)
+Referenced by:
+    TABLE "lab9.book_authors" CONSTRAINT "book_authors_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
+    TABLE "lab9.loans" CONSTRAINT "loans_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
+
               Table "lab9.book_authors"
-  Column   |  Type   | Collation | Nullable | Default 
+  Column   |  Type   | Collation | Nullable | Default
 -----------+---------+-----------+----------+---------
- book_id   | integer |           | not null | 
- author_id | integer |           | not null | 
+ book_id   | integer |           | not null |
+ author_id | integer |           | not null |
 Indexes:
     "book_authors_pkey" PRIMARY KEY, btree (book_id, author_id)
 Foreign-key constraints:
     "book_authors_author_id_fkey" FOREIGN KEY (author_id) REFERENCES lab9.authors(author_id)
     "book_authors_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
 
-                             Table "lab9.loans"
-   Column    |  Type   | Collation | Nullable |           Default            
--------------+---------+-----------+----------+------------------------------
- loan_id     | integer |           | not null | generated always as identity
- member_id   | integer |           | not null | 
- book_id     | integer |           | not null | 
- borrowed_on | date    |           | not null | CURRENT_DATE
- due_on      | date    |           | not null | 
- returned_on | date    |           |          | 
+                                      Table "lab9.members"
+     Column      |          Type          | Collation | Nullable |           Default
+-----------------+------------------------+-----------+----------+------------------------------
+ member_id       | integer                |           | not null | generated always as identity
+ first_name      | character varying(50)  |           | not null |
+ last_name       | character varying(50)  |           | not null |
+ email           | character varying(100) |           | not null |
+ phone           | character varying(15)  |           |          |
+ membership_date | date                   |           |          | CURRENT_DATE
+Indexes:
+    "members_pkey" PRIMARY KEY, btree (member_id)
+    "members_email_key" UNIQUE CONSTRAINT, btree (email)
+Referenced by:
+    TABLE "lab9.loans" CONSTRAINT "loans_member_id_fkey" FOREIGN KEY (member_id) REFERENCES lab9.members(member_id)
+
+                                Table "lab9.loans"
+   Column    |     Type      | Collation | Nullable |           Default
+-------------+---------------+-----------+----------+------------------------------
+ loan_id     | integer       |           | not null | generated always as identity
+ member_id   | integer       |           | not null |
+ book_id     | integer       |           | not null |
+ loan_date   | date          |           | not null | CURRENT_DATE
+ due_date    | date          |           | not null |
+ return_date | date          |           |          |
+ late_fee    | numeric(10,2) |           |          | 0.00
 Indexes:
     "loans_pkey" PRIMARY KEY, btree (loan_id)
-    "loans_due_on_idx" btree (due_on)
+    "loans_due_date_idx" btree (due_date)
 Check constraints:
-    "loans_dates_valid" CHECK (due_on >= borrowed_on AND (returned_on IS NULL OR returned_on >= borrowed_on))
+    "loans_dates_valid" CHECK (due_date >= loan_date AND (return_date IS NULL OR return_date >= loan_date))
+    "loans_late_fee_nonnegative" CHECK (late_fee >= 0::numeric)
 Foreign-key constraints:
     "loans_book_id_fkey" FOREIGN KEY (book_id) REFERENCES lab9.books(book_id)
     "loans_member_id_fkey" FOREIGN KEY (member_id) REFERENCES lab9.members(member_id)
 
-/******** QUERY *********/
-SELECT c.conrelid::regclass AS table_name, c.conname AS constraint_name,
-       CASE c.contype
-           WHEN 'p' THEN 'PRIMARY KEY'
-           WHEN 'f' THEN 'FOREIGN KEY'
-           WHEN 'c' THEN 'CHECK'
-       END AS constraint_type
-FROM pg_constraint c
-JOIN pg_namespace n ON n.oid = c.connamespace
-WHERE n.nspname = 'lab9' AND c.contype IN ('p', 'f', 'c')
-ORDER BY c.conrelid::regclass::text, c.conname;
-/************************/
-
-    table_name     |       constraint_name       | constraint_type 
+    table_name     |       constraint_name       | constraint_type
 -------------------+-----------------------------+-----------------
  lab9.authors      | authors_pkey                | PRIMARY KEY
  lab9.book_authors | book_authors_author_id_fkey | FOREIGN KEY
@@ -59,8 +91,9 @@ ORDER BY c.conrelid::regclass::text, c.conname;
  lab9.books        | books_pkey                  | PRIMARY KEY
  lab9.loans        | loans_book_id_fkey          | FOREIGN KEY
  lab9.loans        | loans_dates_valid           | CHECK
+ lab9.loans        | loans_late_fee_nonnegative  | CHECK
  lab9.loans        | loans_member_id_fkey        | FOREIGN KEY
  lab9.loans        | loans_pkey                  | PRIMARY KEY
  lab9.members      | members_pkey                | PRIMARY KEY
-(10 rows)
+(11 rows)
 
