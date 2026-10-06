@@ -1,0 +1,96 @@
+               List of tables
+ Schema |        Name        | Type  | Owner 
+--------+--------------------+-------+-------
+ lab7   | course_enrollments | table | azim
+ lab7   | customers          | table | azim
+ lab7   | departments        | table | azim
+ lab7   | orders             | table | azim
+ lab7   | pk_added_example   | table | azim
+ lab7   | pk_column_example  | table | azim
+ lab7   | pk_named_example   | table | azim
+ lab7   | pk_table_example   | table | azim
+ lab7   | products           | table | azim
+ lab7   | students           | table | azim
+ lab7   | transactions       | table | azim
+(11 rows)
+
+                                             Table "lab7.students"
+   Column   |          Type          | Collation | Nullable |                      Default                      
+------------+------------------------+-----------+----------+---------------------------------------------------
+ student_id | integer                |           | not null | nextval('lab7.students_student_id_seq'::regclass)
+ name       | character varying(100) |           | not null | 
+ email      | character varying(150) |           |          | 
+ faculty    | character varying(50)  |           |          | 
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (student_id)
+    "students_email_key" UNIQUE CONSTRAINT, btree (email)
+
+                        Table "lab7.course_enrollments"
+     Column      |         Type          | Collation | Nullable |   Default    
+-----------------+-----------------------+-----------+----------+--------------
+ student_id      | integer               |           | not null | 
+ course_id       | integer               |           | not null | 
+ semester        | character varying(20) |           | not null | 
+ enrollment_date | date                  |           |          | CURRENT_DATE
+ grade           | character(2)          |           |          | 
+Indexes:
+    "course_enrollments_pkey" PRIMARY KEY, btree (student_id, course_id, semester)
+
+/******** QUERY *********/
+SELECT student_id, name, faculty FROM lab7.students ORDER BY student_id;
+/************************/
+
+ student_id |     name      |     faculty      
+------------+---------------+------------------
+          1 | Alice Johnson | Computer Science
+          2 | Bob Smith     | Mathematics
+          3 | Carol Davis   | Computer Science
+(3 rows)
+
+/******** QUERY *********/
+SELECT student_id, course_id, semester, grade
+FROM lab7.course_enrollments ORDER BY student_id, course_id, semester;
+/************************/
+
+ student_id | course_id |  semester   | grade 
+------------+-----------+-------------+-------
+          1 |       101 | 2024-Fall   | A+
+          1 |       101 | 2024-Spring | A 
+          1 |       102 | 2024-Spring | B+
+          2 |       101 | 2024-Spring | A-
+(4 rows)
+
+/******** QUERY *********/
+SELECT dept_id, dept_name FROM lab7.departments ORDER BY dept_id;
+/************************/
+
+ dept_id |    dept_name     
+---------+------------------
+       1 | Computer Science
+(1 row)
+
+/******** QUERY *********/
+SELECT c.relname AS table_name, con.conname AS primary_key,
+       pg_get_constraintdef(con.oid) AS definition
+FROM pg_constraint con
+JOIN pg_class c ON c.oid = con.conrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'lab7' AND con.contype = 'p'
+ORDER BY c.relname;
+/************************/
+
+     table_name     |       primary_key       |                  definition                   
+--------------------+-------------------------+-----------------------------------------------
+ course_enrollments | course_enrollments_pkey | PRIMARY KEY (student_id, course_id, semester)
+ customers          | customers_pkey          | PRIMARY KEY (customer_id)
+ departments        | departments_pkey        | PRIMARY KEY (dept_id)
+ orders             | orders_pkey             | PRIMARY KEY (order_id)
+ pk_added_example   | pk_added_example_key    | PRIMARY KEY (student_id)
+ pk_column_example  | pk_column_example_pkey  | PRIMARY KEY (student_id)
+ pk_named_example   | pk_named_example_key    | PRIMARY KEY (student_id)
+ pk_table_example   | pk_table_example_pkey   | PRIMARY KEY (student_id)
+ products           | products_pkey           | PRIMARY KEY (product_id)
+ students           | students_pkey           | PRIMARY KEY (student_id)
+ transactions       | transactions_pkey       | PRIMARY KEY (transaction_id)
+(11 rows)
+

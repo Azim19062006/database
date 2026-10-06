@@ -1,0 +1,80 @@
+              List of tables
+ Schema |       Name       | Type  | Owner 
+--------+------------------+-------+-------
+ lab8   | courses          | table | azim
+ lab8   | departments      | table | azim
+ lab8   | enrollments      | table | azim
+ lab8   | professors       | table | azim
+ lab8   | student_profiles | table | azim
+ lab8   | students         | table | azim
+(6 rows)
+
+                      Table "lab8.enrollments"
+   Column   |         Type          | Collation | Nullable | Default 
+------------+-----------------------+-----------+----------+---------
+ student_id | integer               |           | not null | 
+ course_id  | integer               |           | not null | 
+ semester   | character varying(20) |           | not null | 
+ grade      | character(2)          |           |          | 
+Indexes:
+    "enrollments_pkey" PRIMARY KEY, btree (student_id, course_id, semester)
+Foreign-key constraints:
+    "enrollments_course_fk" FOREIGN KEY (course_id) REFERENCES lab8.courses(course_id) ON DELETE CASCADE
+    "enrollments_student_fk" FOREIGN KEY (student_id) REFERENCES lab8.students(student_id) ON UPDATE CASCADE ON DELETE CASCADE
+
+                       Table "lab8.student_profiles"
+   Column   |  Type   | Collation | Nullable |           Default            
+------------+---------+-----------+----------+------------------------------
+ profile_id | integer |           | not null | generated always as identity
+ student_id | integer |           | not null | 
+Indexes:
+    "student_profiles_pkey" PRIMARY KEY, btree (profile_id)
+    "student_profiles_student_id_key" UNIQUE CONSTRAINT, btree (student_id)
+Foreign-key constraints:
+    "student_profiles_student_id_fkey" FOREIGN KEY (student_id) REFERENCES lab8.students(student_id) ON DELETE CASCADE
+
+/******** QUERY *********/
+SELECT s.name, e.course_id, e.semester, e.grade
+FROM lab8.enrollments e
+JOIN lab8.students s USING (student_id)
+ORDER BY s.name, e.course_id, e.semester;
+/************************/
+
+     name      | course_id |  semester   | grade 
+---------------+-----------+-------------+-------
+ Alice Johnson |       101 | 2024-Fall   | A+
+ Alice Johnson |       101 | 2024-Spring | A 
+ Alice Johnson |       102 | 2024-Spring | B+
+ Bob Smith     |       101 | 2024-Spring | A-
+(4 rows)
+
+/******** QUERY *********/
+SELECT c.conrelid::regclass AS child_table,
+       c.confrelid::regclass AS parent_table,
+       CASE c.confdeltype
+           WHEN 'c' THEN 'CASCADE'
+           WHEN 'n' THEN 'SET NULL'
+           WHEN 'd' THEN 'SET DEFAULT'
+           WHEN 'r' THEN 'RESTRICT'
+           ELSE 'NO ACTION'
+       END AS on_delete,
+       CASE c.confupdtype
+           WHEN 'c' THEN 'CASCADE'
+           ELSE 'NO ACTION'
+       END AS on_update
+FROM pg_constraint c
+JOIN pg_namespace n ON n.oid = c.connamespace
+WHERE n.nspname = 'lab8' AND c.contype = 'f'
+ORDER BY c.conrelid::regclass::text, c.conname;
+/************************/
+
+      child_table      |   parent_table   |  on_delete  | on_update 
+-----------------------+------------------+-------------+-----------
+ lab8.courses          | lab8.departments | SET DEFAULT | NO ACTION
+ lab8.courses          | lab8.professors  | SET NULL    | NO ACTION
+ lab8.enrollments      | lab8.courses     | CASCADE     | NO ACTION
+ lab8.enrollments      | lab8.students    | CASCADE     | CASCADE
+ lab8.professors       | lab8.departments | RESTRICT    | NO ACTION
+ lab8.student_profiles | lab8.students    | CASCADE     | NO ACTION
+(6 rows)
+
