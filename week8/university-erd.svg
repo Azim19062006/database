@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560" role="img" aria-labelledby="title desc">
+  <title id="title">ER-схема учебной базы</title>
+  <desc id="desc">Связи таблиц схемы lab8, полученные из внешних ключей.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="#57c7db" stroke-width="1.7"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="560" rx="18" fill="#101820"/>
+  <text x="40" y="54" fill="#f0f4f8" font-family="Menlo, monospace" font-size="25" font-weight="700">LAB 10 · UNIVERSITY STRUCTURE</text>
+  <text x="40" y="82" fill="#9db0c3" font-family="Menlo, monospace" font-size="15">Схема lab8  •  направления линий: родительская → дочерняя таблица</text>
+
+  <g fill="none" stroke="#57c7db" stroke-width="3" marker-end="url(#arrow)">
+    <path d="M280 260 L360 165"/>
+    <path d="M280 320 L360 400"/>
+    <path d="M475 190 L475 350"/>
+    <path d="M590 405 L710 450"/>
+    <path d="M825 190 L825 230"/>
+    <path d="M940 145 L972 145 L972 450 L940 450"/>
+  </g>
+
+  <g fill="#172838" stroke="#37536a" stroke-width="2">
+    <rect x="50" y="230" width="230" height="120" rx="12"/>
+    <rect x="360" y="100" width="230" height="90" rx="12"/>
+    <rect x="360" y="350" width="230" height="110" rx="12"/>
+    <rect x="710" y="100" width="230" height="90" rx="12"/>
+    <rect x="710" y="230" width="230" height="110" rx="12"/>
+    <rect x="710" y="390" width="230" height="120" rx="12"/>
+  </g>
+
+  <g fill="#76d9e8" font-family="Menlo, monospace" font-size="20" font-weight="700">
+    <text x="72" y="266">departments</text>
+    <text x="382" y="137">professors</text>
+    <text x="382" y="387">courses</text>
+    <text x="732" y="137">students</text>
+    <text x="732" y="267">student_profiles</text>
+    <text x="732" y="427">enrollments</text>
+  </g>
+  <g fill="#dce7f1" font-family="Menlo, monospace" font-size="15">
+    <text x="72" y="298">dept_id  PK</text><text x="72" y="325">dept_name</text>
+    <text x="382" y="169">department_id  FK</text>
+    <text x="382" y="420">department_id  FK</text><text x="382" y="444">professor_id  FK</text>
+    <text x="732" y="169">student_id  PK</text>
+    <text x="732" y="299">student_id  UNIQUE FK</text><text x="732" y="323">profile_id  PK</text>
+    <text x="732" y="460">student_id  FK</text><text x="732" y="484">course_id  FK</text>
+  </g>
+</svg>

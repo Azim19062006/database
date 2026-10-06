@@ -16,15 +16,9 @@
 
 ![Связи таблиц](lab10-relations.png)
 
-```mermaid
-erDiagram
-    STUDENTS ||--o| STUDENT_PROFILES : has
-    STUDENTS ||--o{ ENROLLMENTS : registers
-    COURSES ||--o{ ENROLLMENTS : includes
-    DEPARTMENTS ||--o{ PROFESSORS : employs
-    DEPARTMENTS ||--o{ COURSES : offers
-    PROFESSORS ||--o{ COURSES : teaches
-```
+![ER-схема учебной базы](university-erd.png)
+
+[ER-схема в SVG](university-erd.svg)
 
 В схеме выше показаны связи таблиц `lab8`; библиотечная ER-схема находится в Lab 9.
 

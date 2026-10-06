@@ -10,13 +10,9 @@
 
 [SQL работы](lab9.sql) · [Проверочные команды](verify.sql) · [Вывод psql](result.txt)
 
-```mermaid
-erDiagram
-    BOOKS ||--o{ BOOK_AUTHORS : has
-    AUTHORS ||--o{ BOOK_AUTHORS : writes
-    MEMBERS ||--o{ LOANS : borrows
-    BOOKS ||--o{ LOANS : loaned_as
-```
+![ER-схема библиотеки](library-erd.png)
+
+[ER-схема в SVG](library-erd.svg)
 
 ![Таблицы библиотеки](lab9-tables.png)
 
