@@ -1,0 +1,79 @@
+\set ON_ERROR_STOP on
+\pset pager off
+\set employees_csv :csv_dir '/employees.csv'
+\set names_csv :csv_dir '/new_employees.csv'
+\set products_csv :csv_dir '/products.csv'
+\set customers_csv :csv_dir '/customers.csv'
+\set orders_csv :csv_dir '/orders.csv'
+\set summary_csv :csv_dir '/summary.csv'
+\set nullable_csv :csv_dir '/nullable.csv'
+\set batch_csv :csv_dir '/customers_batch_1.csv'
+\echo '17.1 COPY: source-backed tables in the isolated coursework database'
+CREATE SCHEMA lab17;
+SET search_path TO lab17;
+CREATE TABLE employees AS SELECT employee_id,
+    split_part(name,' ',1) AS first_name,split_part(name,' ',2) AS last_name,
+    salary,department_id,manager_id FROM lab_data.employee;
+CREATE TABLE products AS SELECT product AS product_name,category,spend AS price,
+    transaction_date FROM lab_data.purchases;
+CREATE TABLE customers AS TABLE lab_data.users;
+ALTER TABLE customers ADD PRIMARY KEY(user_id);
+CREATE TABLE orders AS SELECT order_id,user_id,traded_at::date AS order_date,
+    price*quantity AS total_amount,status FROM lab_data.trades;
+CREATE TABLE checks(check_name TEXT PRIMARY KEY,passed BOOLEAN NOT NULL,details TEXT);
+COPY employees TO :'employees_csv' WITH (FORMAT csv,HEADER true,DELIMITER '|',NULL 'N/A');
+CREATE TABLE employees_roundtrip(LIKE employees);
+COPY employees_roundtrip FROM :'employees_csv' WITH (FORMAT csv,HEADER true,DELIMITER '|',NULL 'N/A');
+INSERT INTO checks SELECT 'copy_roundtrip',NOT EXISTS(
+    (TABLE employees EXCEPT ALL TABLE employees_roundtrip)
+    UNION ALL (TABLE employees_roundtrip EXCEPT ALL TABLE employees)),
+    '8 employee rows, pipe delimiter, NULL=N/A';
+\echo '17.2 Specific columns / query export / CSV encoding'
+COPY (SELECT first_name,last_name FROM employees ORDER BY employee_id)
+TO :'names_csv' WITH (FORMAT csv,HEADER true);
+CREATE TABLE names_import(first_name TEXT,last_name TEXT);
+COPY names_import(first_name,last_name) FROM :'names_csv' WITH (FORMAT csv,HEADER true);
+COPY products TO :'products_csv' WITH (FORMAT csv,HEADER true,ENCODING 'UTF8');
+CREATE TABLE products_import(LIKE products);
+COPY products_import FROM :'products_csv' WITH (FORMAT csv,HEADER true,ENCODING 'UTF8');
+\echo '17.3 Delimiter, quote, forced date quoting, embedded quotes and commas'
+COPY customers TO :'customers_csv' WITH (FORMAT csv,HEADER true,DELIMITER ';',QUOTE '"');
+COPY orders TO :'orders_csv' WITH (FORMAT csv,HEADER true,FORCE_QUOTE(order_date));
+COPY (SELECT first_name,last_name,
+             first_name||' '||last_name||', salary="'||salary||'"' AS summary
+      FROM employees ORDER BY employee_id)
+TO :'summary_csv' WITH (FORMAT csv,HEADER true,QUOTE '"',ESCAPE '"');
+CREATE TABLE summary_import(first_name TEXT,last_name TEXT,summary TEXT);
+COPY summary_import FROM :'summary_csv' WITH (FORMAT csv,HEADER true,QUOTE '"',ESCAPE '"');
+COPY employees TO :'nullable_csv' WITH (FORMAT csv,HEADER true,NULL 'NULL');
+CREATE TABLE nullable_import(LIKE employees);
+COPY nullable_import FROM :'nullable_csv' WITH (FORMAT csv,HEADER true,NULL 'NULL');
+INSERT INTO checks SELECT 'csv_options',
+    (SELECT COUNT(*)=8 FROM names_import) AND (SELECT COUNT(*)=7 FROM products_import)
+    AND (SELECT COUNT(*)=3 FROM nullable_import WHERE manager_id IS NULL)
+    AND (SELECT COUNT(*)=8 FROM summary_import WHERE summary LIKE '%"%'),
+    'UTF8; subset columns; semicolon; FORCE_QUOTE(date); commas/quotes; NULL restored';
+\echo '17.4 ETL: extract one real batch, transform email case, upsert'
+CREATE TABLE staging_customers(LIKE customers INCLUDING ALL);
+COPY (SELECT * FROM customers ORDER BY user_id LIMIT 10000 OFFSET 0)
+TO :'batch_csv' WITH (FORMAT csv,HEADER true);
+COPY staging_customers FROM :'batch_csv' WITH (FORMAT csv,HEADER true);
+CREATE TABLE target_customers(LIKE customers INCLUDING ALL);
+INSERT INTO target_customers SELECT user_id,city,lower(email),signup_date FROM staging_customers
+ON CONFLICT(user_id) DO UPDATE SET city=EXCLUDED.city,email=EXCLUDED.email,signup_date=EXCLUDED.signup_date;
+-- Repeat the merge: primary keys prevent duplicate rows.
+INSERT INTO target_customers SELECT user_id,city,lower(email),signup_date FROM staging_customers
+ON CONFLICT(user_id) DO UPDATE SET city=EXCLUDED.city,email=EXCLUDED.email,signup_date=EXCLUDED.signup_date;
+INSERT INTO checks SELECT 'etl_upsert',COUNT(*)=5 AND COUNT(DISTINCT user_id)=5,
+    '5 published users extracted, transformed and merged twice without duplicates' FROM target_customers;
+\echo '17.5 Partitioned migration uses the actual 2021/2022 purchase dates'
+CREATE TABLE partitioned_purchases(product TEXT,spend NUMERIC(10,2),sale_date DATE)
+PARTITION BY RANGE(sale_date);
+CREATE TABLE purchases_2021 PARTITION OF partitioned_purchases
+FOR VALUES FROM('2021-01-01') TO('2022-01-01');
+CREATE TABLE purchases_2022 PARTITION OF partitioned_purchases
+FOR VALUES FROM('2022-01-01') TO('2023-01-01');
+INSERT INTO partitioned_purchases SELECT product,spend,transaction_date::date FROM lab_data.purchases;
+SELECT tableoid::regclass AS partition,COUNT(*) AS rows,SUM(spend) AS total
+FROM partitioned_purchases GROUP BY tableoid ORDER BY tableoid::regclass::text;
+SELECT * FROM checks ORDER BY check_name;

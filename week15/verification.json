@@ -1,0 +1,112 @@
+[
+    {
+        "passed": true,
+        "details": "Tar/gzip base backup and streamed WAL archive passed pg_verifybackup -n",
+        "check_name": "compressed_base_backup"
+    },
+    {
+        "passed": true,
+        "details": "8 employee rows, pipe delimiter, NULL=N/A",
+        "check_name": "copy_roundtrip"
+    },
+    {
+        "passed": true,
+        "details": "7 valid source rows loaded, 1 deliberately corrupted price skipped",
+        "check_name": "copy_skip_bad_row"
+    },
+    {
+        "passed": true,
+        "details": "UTF8; subset columns; semicolon; FORCE_QUOTE(date); commas/quotes; NULL restored",
+        "check_name": "csv_options"
+    },
+    {
+        "passed": true,
+        "details": "Full custom archive restored with 4 jobs; all table hashes match",
+        "check_name": "custom_parallel_restore"
+    },
+    {
+        "passed": true,
+        "details": "Scheduled-ready backup script ran once; no scheduler installed",
+        "check_name": "daily_backup"
+    },
+    {
+        "passed": true,
+        "details": "Committed source data survives stopping and starting PostgreSQL",
+        "check_name": "durability_restart"
+    },
+    {
+        "passed": true,
+        "details": "5 published users extracted, transformed and merged twice without duplicates",
+        "check_name": "etl_upsert"
+    },
+    {
+        "passed": true,
+        "details": "Full + incremental combined, verified and actually started with the later value",
+        "check_name": "incremental_restore"
+    },
+    {
+        "passed": true,
+        "details": "3 initial rows copied, later UPDATE replicated to a second real cluster",
+        "check_name": "logical_migration"
+    },
+    {
+        "passed": true,
+        "details": "Only the 2022 partition migrated (6 actual purchases)",
+        "check_name": "partition_migration"
+    },
+    {
+        "passed": true,
+        "details": "Real standby running in recovery mode",
+        "check_name": "physical_standby"
+    },
+    {
+        "passed": true,
+        "details": "Restored to before_data_migration: deleted row recovered with correct balance",
+        "check_name": "pitr_restore"
+    },
+    {
+        "passed": true,
+        "details": "Time target 2026-10-27 08:47:10.183817+06: first update kept (2002-05-16), second excluded",
+        "check_name": "pitr_time_restore"
+    },
+    {
+        "passed": true,
+        "details": "XID target 1345: first update kept (2002-05-16), second excluded",
+        "check_name": "pitr_xid_restore"
+    },
+    {
+        "passed": true,
+        "details": "All table row counts and content hashes match",
+        "check_name": "plain_restore"
+    },
+    {
+        "passed": true,
+        "details": "Separate schema/data restore matches every table",
+        "check_name": "schema_data_restore"
+    },
+    {
+        "passed": true,
+        "details": "Selected employee and artist tables restored",
+        "check_name": "selective_restore"
+    },
+    {
+        "passed": true,
+        "details": "One row deliberately deleted in the disposable source cluster",
+        "check_name": "source_delete_observed"
+    },
+    {
+        "passed": true,
+        "details": "Committed balance change replayed on physical standby",
+        "check_name": "streaming_migration"
+    },
+    {
+        "passed": true,
+        "details": "pg_restore -t restored only the requested table",
+        "check_name": "table_from_full_archive"
+    },
+    {
+        "passed": true,
+        "details": "8 obsolete WAL copies removed; original recovery archive retained",
+        "check_name": "wal_archive_cleanup"
+    }
+]

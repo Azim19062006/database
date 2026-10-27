@@ -1,0 +1,11 @@
+$ pg_archivecleanup -n /tmp/db17-cleanup-q9_k361v/archive-copy 000000010000000000000009
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000007
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000008
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000001
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000006
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000003
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000004
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000005
+/tmp/db17-cleanup-q9_k361v/archive-copy/000000010000000000000002
+$ pg_archivecleanup /tmp/db17-cleanup-q9_k361v/archive-copy 000000010000000000000009
+{"check": "wal_archive_cleanup", "passed": true, "details": "8 obsolete WAL copies removed; original recovery archive retained"}

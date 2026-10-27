@@ -1,0 +1,47 @@
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/source -l /private/tmp/db17-x_2v9oe3/source.log -w start -o -p 55431 -k /private/tmp/db17-x_2v9oe3/socket -c listen_addresses='' -c shared_buffers=16MB
+waiting for server to start.... done
+server started
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c SELECT birth_date FROM lab11.students WHERE student_id=1
+2002-05-15
+$ pg_basebackup -w -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -D /private/tmp/db17-x_2v9oe3/targets-base -X stream --checkpoint=fast
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c WITH changed AS (UPDATE lab11.students SET birth_date=birth_date+1 WHERE student_id=1 RETURNING *) SELECT pg_current_xact_id() FROM changed
+1345
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c SELECT clock_timestamp()
+2026-10-27 08:47:10.183817+06
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c UPDATE lab11.students SET birth_date=birth_date+1 WHERE student_id=1
+UPDATE 1
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c SELECT pg_walfile_name(pg_current_wal_insert_lsn())
+00000001000000000000000C
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c SELECT pg_switch_wal()
+0/C000348
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/pitr-time -l /private/tmp/db17-x_2v9oe3/pitr-time.log -w start -o -p 55436 -k /private/tmp/db17-x_2v9oe3/socket -c listen_addresses='' -c archive_mode=off -c shared_buffers=16MB
+waiting for server to start.... done
+server started
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55436 -U azim -d coursework -c SELECT pg_is_in_recovery()
+f
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55436 -U azim -d coursework -c SELECT birth_date FROM lab11.students WHERE student_id=1
+2002-05-16
+VERIFIED pitr_time_restore: Target time=2026-10-27 08:47:10.183817+06; first update kept (2002-05-16), second excluded
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/pitr-xid -l /private/tmp/db17-x_2v9oe3/pitr-xid.log -w start -o -p 55437 -k /private/tmp/db17-x_2v9oe3/socket -c listen_addresses='' -c archive_mode=off -c shared_buffers=16MB
+waiting for server to start.... done
+server started
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55437 -U azim -d coursework -c SELECT pg_is_in_recovery()
+f
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55437 -U azim -d coursework -c SELECT birth_date FROM lab11.students WHERE student_id=1
+2002-05-16
+VERIFIED pitr_xid_restore: Target xid=1345; first update kept (2002-05-16), second excluded
+$ psql -X -w -At -v ON_ERROR_STOP=1 -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -d coursework -c UPDATE lab11.students SET birth_date='2002-05-15' WHERE student_id=1
+UPDATE 1
+$ pg_basebackup -w -h /private/tmp/db17-x_2v9oe3/socket -p 55431 -U azim -D /private/tmp/db17-x_2v9oe3/compressed-base -Ft -z -X stream --checkpoint=fast
+$ pg_verifybackup -n /private/tmp/db17-x_2v9oe3/compressed-base
+backup successfully verified
+VERIFIED compressed_base_backup: Tar/gzip base backup and streamed WAL archive passed pg_verifybackup -n
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/pitr-xid -m fast -w stop
+waiting for server to shut down.... done
+server stopped
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/pitr-time -m fast -w stop
+waiting for server to shut down.... done
+server stopped
+$ pg_ctl -D /private/tmp/db17-x_2v9oe3/source -m fast -w stop
+waiting for server to shut down.... done
+server stopped

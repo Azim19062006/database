@@ -1,0 +1,22 @@
+compressed_base_backup|t|Tar/gzip base backup and streamed WAL archive passed pg_verifybackup -n
+copy_roundtrip|t|8 employee rows, pipe delimiter, NULL=N/A
+copy_skip_bad_row|t|7 valid source rows loaded, 1 deliberately corrupted price skipped
+csv_options|t|UTF8; subset columns; semicolon; FORCE_QUOTE(date); commas/quotes; NULL restored
+custom_parallel_restore|t|Full custom archive restored with 4 jobs; all table hashes match
+daily_backup|t|Scheduled-ready backup script ran once; no scheduler installed
+durability_restart|t|Committed source data survives stopping and starting PostgreSQL
+etl_upsert|t|5 published users extracted, transformed and merged twice without duplicates
+incremental_restore|t|Full + incremental combined, verified and actually started with the later value
+logical_migration|t|3 initial rows copied, later UPDATE replicated to a second real cluster
+partition_migration|t|Only the 2022 partition migrated (6 actual purchases)
+physical_standby|t|Real standby running in recovery mode
+pitr_restore|t|Restored to before_data_migration: deleted row recovered with correct balance
+pitr_time_restore|t|Time target 2026-10-27 08:47:10.183817+06: first update kept (2002-05-16), second excluded
+pitr_xid_restore|t|XID target 1345: first update kept (2002-05-16), second excluded
+plain_restore|t|All table row counts and content hashes match
+schema_data_restore|t|Separate schema/data restore matches every table
+selective_restore|t|Selected employee and artist tables restored
+source_delete_observed|t|One row deliberately deleted in the disposable source cluster
+streaming_migration|t|Committed balance change replayed on physical standby
+table_from_full_archive|t|pg_restore -t restored only the requested table
+wal_archive_cleanup|t|8 obsolete WAL copies removed; original recovery archive retained

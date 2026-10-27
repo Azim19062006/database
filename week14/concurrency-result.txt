@@ -1,0 +1,83 @@
+[A] SET statement_timeout='10s'; SET search_path=lab16; \set VERBOSITY sqlstate
+
+[B] SET statement_timeout='10s'; SET search_path=lab16; \set VERBOSITY sqlstate
+
+[monitor] SET statement_timeout='10s'; SET search_path=lab16; \set VERBOSITY sqlstate
+
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+
+16.13 READ UNCOMMITTED cannot see uncommitted changes in PostgreSQL
+[B] BEGIN; UPDATE accounts SET balance=balance+100 WHERE account_id=1;
+[A] BEGIN ISOLATION LEVEL READ UNCOMMITTED; SHOW transaction_isolation;
+[A] read uncommitted
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+[A] ROLLBACK;
+[B] ROLLBACK;
+[monitor] INSERT INTO checks VALUES('no_dirty_read',true,'READ UNCOMMITTED sees only committed data in PostgreSQL');
+
+16.14 Concurrent snapshot experiment: READ COMMITTED
+[A] BEGIN ISOLATION LEVEL READ COMMITTED;
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+[B] UPDATE accounts SET balance=balance+10 WHERE account_id=1;
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3370.00
+[A] ROLLBACK;
+[B] UPDATE accounts SET balance=balance-10 WHERE account_id=1;
+[monitor] INSERT INTO checks VALUES('read_committed',true,'A before=3360.00; A after B commit=3370.00');
+
+16.14 Concurrent snapshot experiment: REPEATABLE READ
+[A] BEGIN ISOLATION LEVEL REPEATABLE READ;
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+[B] UPDATE accounts SET balance=balance+10 WHERE account_id=1;
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+[A] ROLLBACK;
+[B] UPDATE accounts SET balance=balance-10 WHERE account_id=1;
+[monitor] INSERT INTO checks VALUES('repeatable_read',true,'A before=3360.00; A after B commit=3360.00');
+
+16.15 SERIALIZABLE rejects a conflicting concurrent transaction
+[A] BEGIN ISOLATION LEVEL SERIALIZABLE; SELECT SUM(balance) FROM accounts;
+[A] 6331.50
+[B] BEGIN ISOLATION LEVEL SERIALIZABLE; SELECT SUM(balance) FROM accounts;
+[B] 6331.50
+[A] UPDATE accounts SET balance=balance-10 WHERE account_id=1; COMMIT;
+[B] UPDATE accounts SET balance=balance-10 WHERE account_id=2;
+[B] ERROR:  40001
+[B] ROLLBACK;
+[A] UPDATE accounts SET balance=balance+10 WHERE account_id=1;
+[monitor] INSERT INTO checks VALUES('serializable_conflict',true,'One conflicting transaction rejected with SQLSTATE 40001');
+
+16.16 Observe a real blocked transaction using pg_blocking_pids
+[B] SELECT pg_backend_pid();
+[B] 91965
+[A] BEGIN; UPDATE accounts SET balance=balance WHERE account_id=1;
+[B] BEGIN;
+[B] UPDATE accounts SET balance=balance WHERE account_id=1;
+[monitor] SELECT cardinality(pg_blocking_pids(91965))>0;
+[monitor] t
+[A] ROLLBACK;
+[B] ROLLBACK;
+[monitor] INSERT INTO checks VALUES('lock_observed',true,'pg_blocking_pids detected B waiting for A; both rolled back');
+[A] SELECT balance FROM accounts WHERE account_id=1;
+[A] 3360.00
+[monitor] INSERT INTO checks VALUES('durability_reconnect',true,'Committed balances visible from independent psql connections');
+[monitor] SELECT check_name,passed,details FROM checks ORDER BY check_name;
+[monitor] atomic_order_failure|t|FK failure rolls back the preceding order insert
+[monitor] commit_transfer|t|100 transferred; total remains 6030
+[monitor] consistent_total|t|CHECK(balance >= 0) and total = 6030
+[monitor] durability_reconnect|t|Committed balances visible from independent psql connections
+[monitor] insufficient_funds|t|Transfer rejected before any account changes
+[monitor] lock_observed|t|pg_blocking_pids detected B waiting for A; both rolled back
+[monitor] no_dirty_read|t|READ UNCOMMITTED sees only committed data in PostgreSQL
+[monitor] read_committed|t|A before=3360.00; A after B commit=3370.00
+[monitor] repeatable_read|t|A before=3360.00; A after B commit=3360.00
+[monitor] rollback_transfer|t|Balances unchanged after ROLLBACK
+[monitor] savepoint_constraint|t|Negative price rejected (23514); Laptop, Mouse and Keyboard committed
+[monitor] savepoint_order|t|Alice kept; 500 order rolled back; 300 order committed
+[monitor] serializable_conflict|t|One conflicting transaction rejected with SQLSTATE 40001
+
+All concurrent experiments verified against actual PostgreSQL sessions.

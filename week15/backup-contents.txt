@@ -1,0 +1,127 @@
+;
+; Archive created at 2026-10-27 08:31:24 +06
+;     dbname: coursework
+;     TOC Entries: 116
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.6 (Homebrew)
+;     Dumped by pg_dump version: 18.6 (Homebrew)
+;
+;
+; Selected TOC Entries:
+;
+6; 2615 16385 SCHEMA - lab11 azim
+7; 2615 16386 SCHEMA - lab15 azim
+8; 2615 16387 SCHEMA - lab16 azim
+10; 2615 16545 SCHEMA - lab17 azim
+9; 2615 16388 SCHEMA - lab_data azim
+224; 1259 16389 TABLE lab11 students azim
+225; 1259 16393 SEQUENCE lab11 students_student_id_seq azim
+4067; 0 0 SEQUENCE OWNED BY lab11 students_student_id_seq azim
+226; 1259 16394 TABLE lab15 pivoted_sales azim
+227; 1259 16399 TABLE lab16 accounts azim
+228; 1259 16405 TABLE lab16 checks azim
+229; 1259 16412 TABLE lab16 customers azim
+230; 1259 16418 SEQUENCE lab16 customers_customer_id_seq azim
+4068; 0 0 SEQUENCE OWNED BY lab16 customers_customer_id_seq azim
+231; 1259 16419 TABLE lab16 inventory azim
+232; 1259 16424 TABLE lab16 logs azim
+233; 1259 16429 TABLE lab16 order_items azim
+234; 1259 16433 TABLE lab16 orders azim
+235; 1259 16437 SEQUENCE lab16 orders_order_id_seq azim
+4069; 0 0 SEQUENCE OWNED BY lab16 orders_order_id_seq azim
+236; 1259 16438 TABLE lab16 products azim
+237; 1259 16445 SEQUENCE lab16 products_product_id_seq azim
+4070; 0 0 SEQUENCE OWNED BY lab16 products_product_id_seq azim
+248; 1259 16569 TABLE lab17 checks azim
+246; 1259 16556 TABLE lab17 customers azim
+244; 1259 16546 TABLE lab17 employees azim
+249; 1259 16578 TABLE lab17 employees_roundtrip azim
+250; 1259 16583 TABLE lab17 names_import azim
+253; 1259 16598 TABLE lab17 nullable_import azim
+247; 1259 16564 TABLE lab17 orders azim
+256; 1259 16619 TABLE lab17 partitioned_purchases azim
+245; 1259 16551 TABLE lab17 products azim
+251; 1259 16588 TABLE lab17 products_import azim
+259; 1259 16632 TABLE lab17 products_skip azim
+257; 1259 16622 TABLE lab17 purchases_2021 azim
+258; 1259 16627 TABLE lab17 purchases_2022 azim
+254; 1259 16603 TABLE lab17 staging_customers azim
+252; 1259 16593 TABLE lab17 summary_import azim
+255; 1259 16611 TABLE lab17 target_customers azim
+238; 1259 16446 TABLE lab_data artists azim
+239; 1259 16452 TABLE lab_data employee azim
+240; 1259 16460 TABLE lab_data purchases azim
+241; 1259 16465 TABLE lab_data songs azim
+242; 1259 16471 TABLE lab_data trades azim
+243; 1259 16477 TABLE lab_data users azim
+3827; 0 0 TABLE ATTACH lab17 purchases_2021 azim
+3828; 0 0 TABLE ATTACH lab17 purchases_2022 azim
+3829; 2604 16483 DEFAULT lab11 students student_id azim
+3830; 2604 16484 DEFAULT lab16 customers customer_id azim
+3831; 2604 16485 DEFAULT lab16 orders order_id azim
+3832; 2604 16486 DEFAULT lab16 products product_id azim
+4026; 0 16389 TABLE DATA lab11 students azim
+4028; 0 16394 TABLE DATA lab15 pivoted_sales azim
+4029; 0 16399 TABLE DATA lab16 accounts azim
+4030; 0 16405 TABLE DATA lab16 checks azim
+4031; 0 16412 TABLE DATA lab16 customers azim
+4033; 0 16419 TABLE DATA lab16 inventory azim
+4034; 0 16424 TABLE DATA lab16 logs azim
+4035; 0 16429 TABLE DATA lab16 order_items azim
+4036; 0 16433 TABLE DATA lab16 orders azim
+4038; 0 16438 TABLE DATA lab16 products azim
+4050; 0 16569 TABLE DATA lab17 checks azim
+4048; 0 16556 TABLE DATA lab17 customers azim
+4046; 0 16546 TABLE DATA lab17 employees azim
+4051; 0 16578 TABLE DATA lab17 employees_roundtrip azim
+4052; 0 16583 TABLE DATA lab17 names_import azim
+4055; 0 16598 TABLE DATA lab17 nullable_import azim
+4049; 0 16564 TABLE DATA lab17 orders azim
+4047; 0 16551 TABLE DATA lab17 products azim
+4053; 0 16588 TABLE DATA lab17 products_import azim
+4060; 0 16632 TABLE DATA lab17 products_skip azim
+4058; 0 16622 TABLE DATA lab17 purchases_2021 azim
+4059; 0 16627 TABLE DATA lab17 purchases_2022 azim
+4056; 0 16603 TABLE DATA lab17 staging_customers azim
+4054; 0 16593 TABLE DATA lab17 summary_import azim
+4057; 0 16611 TABLE DATA lab17 target_customers azim
+4040; 0 16446 TABLE DATA lab_data artists azim
+4041; 0 16452 TABLE DATA lab_data employee azim
+4042; 0 16460 TABLE DATA lab_data purchases azim
+4043; 0 16465 TABLE DATA lab_data songs azim
+4044; 0 16471 TABLE DATA lab_data trades azim
+4045; 0 16477 TABLE DATA lab_data users azim
+4071; 0 0 SEQUENCE SET lab11 students_student_id_seq azim
+4072; 0 0 SEQUENCE SET lab16 customers_customer_id_seq azim
+4073; 0 0 SEQUENCE SET lab16 orders_order_id_seq azim
+4074; 0 0 SEQUENCE SET lab16 products_product_id_seq azim
+3838; 2606 16488 CONSTRAINT lab11 students students_pkey azim
+3840; 2606 16490 CONSTRAINT lab16 accounts accounts_pkey azim
+3842; 2606 16492 CONSTRAINT lab16 checks checks_pkey azim
+3844; 2606 16494 CONSTRAINT lab16 customers customers_pkey azim
+3846; 2606 16496 CONSTRAINT lab16 inventory inventory_pkey azim
+3848; 2606 16498 CONSTRAINT lab16 orders orders_pkey azim
+3850; 2606 16500 CONSTRAINT lab16 products products_pkey azim
+3868; 2606 16577 CONSTRAINT lab17 checks checks_pkey azim
+3866; 2606 16563 CONSTRAINT lab17 customers customers_pkey azim
+3870; 2606 16610 CONSTRAINT lab17 staging_customers staging_customers_pkey azim
+3872; 2606 16618 CONSTRAINT lab17 target_customers target_customers_pkey azim
+3852; 2606 16502 CONSTRAINT lab_data artists artists_pkey azim
+3854; 2606 16504 CONSTRAINT lab_data employee employee_pkey azim
+3859; 2606 16506 CONSTRAINT lab_data songs songs_pkey azim
+3862; 2606 16508 CONSTRAINT lab_data trades trades_pkey azim
+3864; 2606 16510 CONSTRAINT lab_data users users_pkey azim
+3855; 1259 16511 INDEX lab_data idx_employee_manager_id azim
+3856; 1259 16512 INDEX lab_data idx_purchases_category azim
+3857; 1259 16513 INDEX lab_data idx_songs_artist_id azim
+3860; 1259 16514 INDEX lab_data idx_trades_user_id azim
+3873; 2606 16515 FK CONSTRAINT lab16 inventory inventory_product_id_fkey azim
+3874; 2606 16520 FK CONSTRAINT lab16 order_items order_items_order_id_fkey azim
+3875; 2606 16525 FK CONSTRAINT lab16 order_items order_items_product_id_fkey azim
+3876; 2606 16530 FK CONSTRAINT lab16 orders orders_customer_id_fkey azim
+3877; 2606 16535 FK CONSTRAINT lab_data songs songs_artist_id_fkey azim
+3878; 2606 16540 FK CONSTRAINT lab_data trades trades_user_id_fkey azim

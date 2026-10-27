@@ -1,0 +1,287 @@
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+\echo '16.1 Create the exercise tables; account opening amounts are copied from published salaries'
+16.1 Create the exercise tables; account opening amounts are copied from published salaries
+BEGIN;
+BEGIN
+CREATE SCHEMA lab16;
+CREATE SCHEMA
+SET LOCAL search_path TO lab16;
+SET
+CREATE TABLE accounts(account_id INTEGER PRIMARY KEY,balance NUMERIC(12,2) NOT NULL CHECK(balance>=0));
+CREATE TABLE
+INSERT INTO accounts SELECT employee_id,salary FROM lab_data.employee WHERE employee_id IN(1,2);
+INSERT 0 2
+CREATE TABLE customers(customer_id SERIAL PRIMARY KEY,name TEXT,email TEXT);
+CREATE TABLE
+CREATE TABLE orders(order_id SERIAL PRIMARY KEY,customer_id INTEGER REFERENCES customers,total NUMERIC(10,2));
+CREATE TABLE
+CREATE TABLE products(product_id SERIAL PRIMARY KEY,name TEXT,price NUMERIC(10,2) CHECK(price>=0));
+CREATE TABLE
+CREATE TABLE order_items(order_id INTEGER REFERENCES orders,product_id INTEGER REFERENCES products,quantity INTEGER CHECK(quantity>0));
+CREATE TABLE
+CREATE TABLE inventory(product_id INTEGER PRIMARY KEY REFERENCES products,stock INTEGER CHECK(stock>=0));
+CREATE TABLE
+CREATE TABLE logs(message TEXT);
+CREATE TABLE
+CREATE TABLE checks(check_name TEXT PRIMARY KEY,passed BOOLEAN NOT NULL,details TEXT);
+CREATE TABLE
+COMMIT;
+COMMIT
+SET search_path TO lab16;
+SET
+TABLE accounts;
+ account_id | balance
+------------+---------
+          1 | 3800.00
+          2 | 2230.00
+(2 rows)
+
+\echo '16.2 BEGIN / COMMIT: transfer 100, both updates persist'
+16.2 BEGIN / COMMIT: transfer 100, both updates persist
+BEGIN;
+BEGIN
+UPDATE accounts SET balance=balance-100 WHERE account_id=1;
+UPDATE 1
+UPDATE accounts SET balance=balance+100 WHERE account_id=2;
+UPDATE 1
+COMMIT;
+COMMIT
+TABLE accounts;
+ account_id | balance
+------------+---------
+          1 | 3700.00
+          2 | 2330.00
+(2 rows)
+
+INSERT INTO checks SELECT 'commit_transfer',
+    (SELECT balance=3700 FROM accounts WHERE account_id=1) AND
+    (SELECT balance=2330 FROM accounts WHERE account_id=2),'100 transferred; total remains 6030';
+INSERT 0 1
+\echo '16.3 BEGIN / ROLLBACK: both changes are undone'
+16.3 BEGIN / ROLLBACK: both changes are undone
+BEGIN;
+BEGIN
+UPDATE accounts SET balance=balance-100 WHERE account_id=1;
+UPDATE 1
+UPDATE accounts SET balance=balance+100 WHERE account_id=2;
+UPDATE 1
+ROLLBACK;
+ROLLBACK
+TABLE accounts;
+ account_id | balance
+------------+---------
+          1 | 3700.00
+          2 | 2330.00
+(2 rows)
+
+INSERT INTO checks SELECT 'rollback_transfer',
+    (SELECT balance=3700 FROM accounts WHERE account_id=1) AND
+    (SELECT balance=2330 FROM accounts WHERE account_id=2),'Balances unchanged after ROLLBACK';
+INSERT 0 1
+\echo '16.4 Consistency and explicit transaction: source transfer of 500'
+16.4 Consistency and explicit transaction: source transfer of 500
+BEGIN;
+BEGIN
+SELECT balance FROM accounts WHERE account_id=1 FOR UPDATE;
+ balance
+---------
+ 3700.00
+(1 row)
+
+UPDATE accounts SET balance=balance-500 WHERE account_id=1;
+UPDATE 1
+UPDATE accounts SET balance=balance+500 WHERE account_id=2;
+UPDATE 1
+COMMIT;
+COMMIT
+INSERT INTO checks SELECT 'consistent_total',SUM(balance)=6030,'CHECK(balance >= 0) and total = 6030' FROM accounts;
+INSERT 0 1
+\echo '16.5 Customers/orders: use RETURNING rather than ambiguous LASTVAL'
+16.5 Customers/orders: use RETURNING rather than ambiguous LASTVAL
+BEGIN;
+BEGIN
+INSERT INTO customers(name,email) VALUES('John Doe','john@email.com') RETURNING customer_id \gset
+INSERT 0 1
+INSERT INTO orders(customer_id,total) VALUES(:customer_id,100.00);
+INSERT 0 1
+COMMIT;
+COMMIT
+\echo '16.6 Savepoint: cancel first order, keep customer and replacement order'
+16.6 Savepoint: cancel first order, keep customer and replacement order
+BEGIN;
+BEGIN
+INSERT INTO customers(name,email) VALUES('Alice','alice@email.com') RETURNING customer_id \gset
+INSERT 0 1
+SAVEPOINT after_customer_insert;
+SAVEPOINT
+INSERT INTO orders(customer_id,total) VALUES(:customer_id,500.00);
+INSERT 0 1
+ROLLBACK TO SAVEPOINT after_customer_insert;
+ROLLBACK
+INSERT INTO orders(customer_id,total) VALUES(:customer_id,300.00);
+INSERT 0 1
+COMMIT;
+COMMIT
+SELECT c.name,o.total FROM customers c JOIN orders o USING(customer_id) ORDER BY c.customer_id;
+   name   | total
+----------+--------
+ John Doe | 100.00
+ Alice    | 300.00
+(2 rows)
+
+INSERT INTO checks SELECT 'savepoint_order',COUNT(*)=1 AND MIN(total)=300,
+    'Alice kept; 500 order rolled back; 300 order committed'
+FROM orders WHERE customer_id=:customer_id;
+INSERT 0 1
+\echo '16.7 Multiple savepoints: actual CHECK violation and recovery'
+16.7 Multiple savepoints: actual CHECK violation and recovery
+BEGIN;
+BEGIN
+INSERT INTO products(name,price) VALUES('Laptop',999.99);
+INSERT 0 1
+SAVEPOINT sp1;
+SAVEPOINT
+INSERT INTO products(name,price) VALUES('Mouse',25.99);
+INSERT 0 1
+SAVEPOINT sp2;
+SAVEPOINT
+\set ON_ERROR_STOP off
+INSERT INTO products(name,price) VALUES('Invalid Product',-50.00);
+psql:week14/lab16.sql:68: ERROR:  new row for relation "products" violates check constraint "products_price_check"
+DETAIL:  Failing row contains (3, Invalid Product, -50.00).
+\set invalid_price_state :SQLSTATE
+\set ON_ERROR_STOP on
+ROLLBACK TO SAVEPOINT sp2;
+ROLLBACK
+SELECT :'invalid_price_state'='23514' AS expected_check_failure \gset
+\if :expected_check_failure
+\echo 'Expected SQLSTATE 23514; transaction recovered through SAVEPOINT'
+Expected SQLSTATE 23514; transaction recovered through SAVEPOINT
+\else
+\quit 1
+\endif
+INSERT INTO products(name,price) VALUES('Keyboard',79.99);
+INSERT 0 1
+COMMIT;
+COMMIT
+TABLE products;
+ product_id |   name   | price
+------------+----------+--------
+          1 | Laptop   | 999.99
+          2 | Mouse    |  25.99
+          4 | Keyboard |  79.99
+(3 rows)
+
+INSERT INTO checks SELECT 'savepoint_constraint',COUNT(*)=3 AND MIN(price)>0,
+    'Negative price rejected (23514); Laptop, Mouse and Keyboard committed' FROM products;
+INSERT 0 1
+\echo '16.8 RELEASE SAVEPOINT'
+16.8 RELEASE SAVEPOINT
+BEGIN;
+BEGIN
+INSERT INTO logs VALUES('Starting process');
+INSERT 0 1
+SAVEPOINT process_start;
+SAVEPOINT
+INSERT INTO logs VALUES('Process completed');
+INSERT 0 1
+RELEASE SAVEPOINT process_start;
+RELEASE
+COMMIT;
+COMMIT
+\echo '16.9 Atomic order failure: rollback all statements in the failed unit'
+16.9 Atomic order failure: rollback all statements in the failed unit
+DO $$
+DECLARE old_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO old_count FROM orders;
+    BEGIN
+        INSERT INTO orders(customer_id,total) VALUES(1,250.00);
+        INSERT INTO order_items(order_id,product_id,quantity)
+        VALUES(currval('orders_order_id_seq'),101,2);
+        RAISE EXCEPTION 'Expected missing product FK';
+    EXCEPTION WHEN foreign_key_violation THEN
+        RAISE NOTICE '23503: order and item rolled back together';
+    END;
+    INSERT INTO checks SELECT 'atomic_order_failure',COUNT(*)=old_count,
+        'FK failure rolls back the preceding order insert' FROM orders;
+END $$;
+psql:week14/lab16.sql:105: NOTICE:  23503: order and item rolled back together
+DO
+\echo '16.10 Short transaction: inventory decrement and order item'
+16.10 Short transaction: inventory decrement and order item
+-- Opening stock uses quantity 10 from the published DataLemur trade 100102.
+INSERT INTO inventory SELECT 1,quantity FROM lab_data.trades WHERE order_id=100102;
+INSERT 0 1
+BEGIN;
+BEGIN
+UPDATE inventory SET stock=stock-1 WHERE product_id=1;
+UPDATE 1
+INSERT INTO order_items(order_id,product_id,quantity) VALUES(1,1,1);
+INSERT 0 1
+COMMIT;
+COMMIT
+\echo '16.11 Insufficient funds: PostgreSQL exception handling'
+16.11 Insufficient funds: PostgreSQL exception handling
+DO $$
+BEGIN
+    BEGIN
+        IF (SELECT balance FROM accounts WHERE account_id=1)<100000 THEN
+            RAISE EXCEPTION USING ERRCODE='P0001', MESSAGE='Insufficient funds';
+        END IF;
+        UPDATE accounts SET balance=balance-100000 WHERE account_id=1;
+    EXCEPTION WHEN SQLSTATE 'P0001' THEN
+        INSERT INTO checks VALUES('insufficient_funds',true,'Transfer rejected before any account changes');
+    END;
+END $$;
+DO
+\echo '16.12 Session isolation and SERIALIZABLE transaction'
+16.12 Session isolation and SERIALIZABLE transaction
+SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SET
+BEGIN;
+BEGIN
+SHOW transaction_isolation;
+ transaction_isolation
+-----------------------
+ repeatable read
+(1 row)
+
+COMMIT;
+COMMIT
+SET SESSION CHARACTERISTICS AS TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SET
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+BEGIN
+SELECT * FROM accounts ORDER BY account_id;
+ account_id | balance
+------------+---------
+          1 | 3200.00
+          2 | 2830.00
+(2 rows)
+
+UPDATE accounts SET balance=balance*1.05;
+UPDATE 2
+COMMIT;
+COMMIT
+SELECT * FROM accounts ORDER BY account_id;
+ account_id | balance
+------------+---------
+          1 | 3360.00
+          2 | 2971.50
+(2 rows)
+
+SELECT * FROM checks ORDER BY check_name;
+      check_name      | passed |                                details
+----------------------+--------+-----------------------------------------------------------------------
+ atomic_order_failure | t      | FK failure rolls back the preceding order insert
+ commit_transfer      | t      | 100 transferred; total remains 6030
+ consistent_total     | t      | CHECK(balance >= 0) and total = 6030
+ insufficient_funds   | t      | Transfer rejected before any account changes
+ rollback_transfer    | t      | Balances unchanged after ROLLBACK
+ savepoint_constraint | t      | Negative price rejected (23514); Laptop, Mouse and Keyboard committed
+ savepoint_order      | t      | Alice kept; 500 order rolled back; 300 order committed
+(7 rows)
+

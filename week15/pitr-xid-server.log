@@ -1,0 +1,31 @@
+2026-10-27 08:47:11.632 +06 [93186] LOG:  starting PostgreSQL 18.6 (Homebrew) on aarch64-apple-darwin25.6.0, compiled by Apple clang version 21.0.0 (clang-2100.1.1.101), 64-bit
+2026-10-27 08:47:11.632 +06 [93186] LOG:  listening on Unix socket "/private/tmp/db17-x_2v9oe3/socket/.s.PGSQL.55437"
+2026-10-27 08:47:11.636 +06 [93192] LOG:  database system was interrupted; last known up at 2026-10-27 08:47:09 +06
+cp: /private/tmp/db17-x_2v9oe3/wal_archive/00000002.history: No such file or directory
+2026-10-27 08:47:11.714 +06 [93192] LOG:  starting backup recovery with redo LSN 0/B000028, checkpoint LSN 0/B000080, on timeline ID 1
+2026-10-27 08:47:11.732 +06 [93192] LOG:  restored log file "00000001000000000000000B" from archive
+2026-10-27 08:47:11.733 +06 [93192] LOG:  starting point-in-time recovery to XID 1345
+2026-10-27 08:47:11.734 +06 [93192] LOG:  redo starts at 0/B000028
+2026-10-27 08:47:11.750 +06 [93192] LOG:  restored log file "00000001000000000000000C" from archive
+cp: /private/tmp/db17-x_2v9oe3/wal_archive/00000001000000000000000D: No such file or directory
+2026-10-27 08:47:11.753 +06 [93192] LOG:  completed backup recovery with redo LSN 0/B000028 and end LSN 0/B000120
+2026-10-27 08:47:11.753 +06 [93192] LOG:  consistent recovery state reached at 0/B000120
+2026-10-27 08:47:11.753 +06 [93186] LOG:  database system is ready to accept read-only connections
+2026-10-27 08:47:11.754 +06 [93192] LOG:  recovery stopping after commit of transaction 1345, time 2026-10-27 08:47:10.176951+06
+2026-10-27 08:47:11.754 +06 [93192] LOG:  redo done at 0/C000270 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.01 s
+2026-10-27 08:47:11.754 +06 [93192] LOG:  last completed transaction was at log time 2026-10-27 08:47:10.176951+06
+2026-10-27 08:47:11.769 +06 [93192] LOG:  restored log file "00000001000000000000000C" from archive
+cp: /private/tmp/db17-x_2v9oe3/wal_archive/00000002.history: No such file or directory
+2026-10-27 08:47:11.774 +06 [93192] LOG:  selected new timeline ID: 2
+cp: /private/tmp/db17-x_2v9oe3/wal_archive/00000001.history: No such file or directory
+2026-10-27 08:47:11.785 +06 [93192] LOG:  archive recovery complete
+2026-10-27 08:47:11.785 +06 [93190] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-10-27 08:47:11.786 +06 [93190] LOG:  checkpoint complete: wrote 2 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=4, longest=0.001 s, average=0.001 s; distance=16384 kB, estimate=16384 kB; lsn=0/C0002A0, redo lsn=0/C0002A0
+2026-10-27 08:47:11.786 +06 [93186] LOG:  database system is ready to accept connections
+2026-10-27 08:47:13.231 +06 [93186] LOG:  received fast shutdown request
+2026-10-27 08:47:13.231 +06 [93186] LOG:  aborting any active transactions
+2026-10-27 08:47:13.231 +06 [93186] LOG:  background worker "logical replication launcher" (PID 93203) exited with exit code 1
+2026-10-27 08:47:13.232 +06 [93190] LOG:  shutting down
+2026-10-27 08:47:13.232 +06 [93190] LOG:  checkpoint starting: shutdown immediate
+2026-10-27 08:47:13.232 +06 [93190] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=1, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=14746 kB; lsn=0/C0004C0, redo lsn=0/C0004C0
+2026-10-27 08:47:13.234 +06 [93186] LOG:  database system is shut down

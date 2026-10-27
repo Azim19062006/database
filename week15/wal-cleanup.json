@@ -1,0 +1,5 @@
+{
+  "check": "wal_archive_cleanup",
+  "passed": true,
+  "details": "8 obsolete WAL copies removed; original recovery archive retained"
+}

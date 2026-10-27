@@ -1,0 +1,9 @@
+product_name,category,price,transaction_date
+washing machine,appliance,219.80,2022-03-02 11:00:00
+vacuum,electronics,152.00,2022-04-05 10:00:00
+wireless headset,electronics,249.90,2022-07-08 10:00:00
+vacuum,electronics,189.00,2022-07-15 10:00:00
+computer mouse,electronics,45.00,2022-07-01 11:00:00
+refrigerator,appliance,246.00,2021-12-26 12:00:00
+refrigerator,appliance,299.99,2022-03-02 11:00:00
+washing machine,appliance,not-a-number,2022-03-02 11:00:00
